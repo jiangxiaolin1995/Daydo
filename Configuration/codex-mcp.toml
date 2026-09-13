@@ -1,0 +1,3 @@
+[mcp_servers.daydo]
+command = "/Applications/Daydo.app/Contents/MacOS/Daydo"
+args = ["--mcp"]

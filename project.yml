@@ -1,0 +1,130 @@
+name: Daydo
+options:
+  bundleIdPrefix: com.xiaolin.daydo
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "26.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: 2S5P3UNGAL
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+packages:
+  DaydoCore:
+    path: .
+  MCP:
+    url: https://github.com/modelcontextprotocol/swift-sdk.git
+    exactVersion: 0.12.1
+  SwiftNIO:
+    url: https://github.com/apple/swift-nio.git
+    exactVersion: 2.86.0
+  SwiftCollections:
+    url: https://github.com/apple/swift-collections.git
+    exactVersion: 1.2.1
+  SwiftAtomics:
+    url: https://github.com/apple/swift-atomics.git
+    exactVersion: 1.3.0
+targets:
+  Daydo:
+    type: application
+    platform: macOS
+    sources:
+      - App
+      - Views
+      - Services
+      - MCP
+      - Shared
+      - Assets/Assets.xcassets
+      - path: THIRD_PARTY_NOTICES.txt
+        buildPhase: resources
+    dependencies:
+      - package: DaydoCore
+      - package: MCP
+        product: MCP
+      - target: DaydoWidget
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xiaolin.daydo
+        CODE_SIGN_ENTITLEMENTS: Configuration/Daydo.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Debug:
+          DAYDO_ICLOUD_ENVIRONMENT: Development
+          DAYDO_APS_ENVIRONMENT: development
+        Release:
+          DAYDO_ICLOUD_ENVIRONMENT: Production
+          DAYDO_APS_ENVIRONMENT: production
+    info:
+      path: Configuration/Daydo-Info.plist
+      properties:
+        CFBundleDisplayName: Daydo
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSApplicationCategoryType: public.app-category.productivity
+        NSHumanReadableCopyright: Copyright © 2026 Daydo
+        CFBundleURLTypes:
+          - CFBundleURLName: com.xiaolin.daydo
+            CFBundleURLSchemes: [daydo]
+    entitlements:
+      path: Configuration/Daydo.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.application-groups:
+          - 2S5P3UNGAL.com.xiaolin.daydo
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.xiaolin.daydo
+        com.apple.developer.icloud-services: [CloudKit]
+        com.apple.developer.icloud-container-environment: "$(DAYDO_ICLOUD_ENVIRONMENT)"
+        com.apple.developer.aps-environment: "$(DAYDO_APS_ENVIRONMENT)"
+  DaydoWidget:
+    type: app-extension
+    platform: macOS
+    sources:
+      - Widget
+      - Shared
+      - Services/CloudAccountService.swift
+    dependencies:
+      - package: DaydoCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xiaolin.daydo.widget
+        CODE_SIGN_ENTITLEMENTS: Configuration/Widget.entitlements
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) WIDGET_EXTENSION"
+      configs:
+        Debug:
+          DAYDO_ICLOUD_ENVIRONMENT: Development
+        Release:
+          DAYDO_ICLOUD_ENVIRONMENT: Production
+    info:
+      path: Configuration/Widget-Info.plist
+      properties:
+        CFBundleDisplayName: Daydo
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Configuration/Widget.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.developer.icloud-container-identifiers: [iCloud.com.xiaolin.daydo]
+        com.apple.developer.icloud-services: [CloudKit]
+        com.apple.developer.icloud-container-environment: "$(DAYDO_ICLOUD_ENVIRONMENT)"
+        com.apple.security.application-groups:
+          - 2S5P3UNGAL.com.xiaolin.daydo
+schemes:
+  Daydo:
+    build:
+      targets:
+        Daydo: all
+        DaydoWidget: all
