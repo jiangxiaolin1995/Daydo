@@ -90,7 +90,9 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
 ### GitHub 公开发布（2026-09-14）
 
 - 用户授权公开源码、编写面向用户的 README，并在 GitHub Releases 提供 DMG。
-- 仓库目标为 `jiangxiaolin1995/Daydo`。MCP 示例改用 `/Applications`，运行日志、任务数据、
+- 公开仓库已创建：[jiangxiaolin1995/Daydo](https://github.com/jiangxiaolin1995/Daydo)，
+  首次源码提交 `f12278d` 已推送到 main，并核对本地、远程提交及 README 内容一致。
+  MCP 示例改用 `/Applications`，运行日志、任务数据、
   签名材料和构建产物不进入源码仓库；发行包包含七个 Swift 依赖的许可与声明。
 - 重新运行 38 项核心测试，全部通过。Release 归档成功，主应用与小组件均包含 arm64 和
   x86_64，完成 Intent 的后台执行元数据验证通过。Intel Mac 实机验收仍未完成。
@@ -98,6 +100,8 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
   Developer ID Application 身份。自动导出返回 `No Accounts` 和主应用／小组件缺少
   Developer ID profiles；Xcode 保存的账户凭据缺失，需用户恢复 Xcode 账户登录。
   尚未完成通用安装包签名、公证和下载验收；不能直接上传现有开发包作为公开 DMG。
+- 已创建 `v1.0.0-beta.1` Release 草稿，写明功能和已知限制；签名、公证未完成，暂未
+  上传或公开 DMG 附件。已请求用户解锁 Mac 并恢复 Xcode 的 Apple Developer 账户登录。
 - 可重复的构建、导出、公证和发布步骤见 [RELEASING.md](RELEASING.md)。
 
 ### 应用与设备验收
