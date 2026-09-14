@@ -116,10 +116,11 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
 
 ### GitHub 公开发布（2026-09-14）
 
-- 用户已授权将菜单栏、关窗和 MCP 后台修复提交到 main、推送 GitHub 并发布新包。
-  当前本地与 origin/main 基线一致；Beta 2 使用新 tag `v1.0.0-beta.2`，不覆盖 Beta 1。
-  发布前重新测试，重新构建双架构 Release，验证分发签名并分别公证应用与 DMG。
-  完成后更新 README 下载链接并验证公开下载的实际附件。
+- 菜单栏、关窗和 MCP 后台修复已提交到 main 并推送 GitHub；1.0.0 Beta 2（build 2）
+  已于 2026-09-14 13:58（Asia/Shanghai）公开发布。新 tag `v1.0.0-beta.2`
+  指向 `5e1cc9b`，与构建提交 `e65fc7a` 之间只有文档差异；保留 Beta 1。
+  [Beta 2 发布页](https://github.com/jiangxiaolin1995/Daydo/releases/tag/v1.0.0-beta.2)
+  提供双架构 DMG 和 SHA256SUMS.txt，README 已更新下载链接。
 - Beta 2 源码提交 `e65fc7a` 已推送并核对 origin/main 一致；重新运行 45 项测试通过。
   归档和导出均完成，主应用与小组件版本 1.0.0、build 2，均含 arm64 与 x86_64。
   云管理 Developer ID 签名、可信时间戳、hardened runtime、Production CloudKit、
@@ -129,6 +130,11 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
   Gatekeeper 和两种架构正确；挂载已卸载。最终 DMG 为 5,900,777 字节，SHA-256 为
   `760fb3afc319d9e7efb1a859a403bb0ac9eaa7306cc68cfb6d04a8346b56dfe7`。
   导出应用的真实 stdio `get_status` 返回 ready=true、signInRequired=false，客户端已退出。
+- 2026-09-14 14:00（Asia/Shanghai）通过未登录请求重新下载公开 DMG 与校验文件，
+  大小、SHA-256、GitHub 附件摘要均与本地产物一致；远程 README 指向 Beta 2。
+  下载后的 DMG 再次通过完整性、公证票据、只读挂载、应用严格签名、Gatekeeper、
+  版本及双架构检查，应用二进制与导出产物一致；验证挂载已卸载。
+  当前仍以预发布版本提供，Intel 实机、macOS 14 实机及双机 iCloud 验收未完成。
 - 用户授权公开源码、编写面向用户的 README，并在 GitHub Releases 提供 DMG。
 - 公开仓库已创建：[jiangxiaolin1995/Daydo](https://github.com/jiangxiaolin1995/Daydo)，
   首次源码提交 `f12278d` 已推送到 main，并核对本地、远程提交及 README 内容一致。
