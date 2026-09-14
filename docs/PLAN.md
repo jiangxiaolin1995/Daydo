@@ -96,12 +96,20 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
   签名材料和构建产物不进入源码仓库；发行包包含七个 Swift 依赖的许可与声明。
 - 重新运行 38 项核心测试，全部通过。Release 归档成功，主应用与小组件均包含 arm64 和
   x86_64，完成 Intent 的后台执行元数据验证通过。Intel Mac 实机验收仍未完成。
-- 当前安装包仅有 Apple Development 签名、单台注册设备的描述文件；本机未发现
-  Developer ID Application 身份。自动导出返回 `No Accounts` 和主应用／小组件缺少
-  Developer ID profiles；Xcode 保存的账户凭据缺失，需用户恢复 Xcode 账户登录。
-  尚未完成通用安装包签名、公证和下载验收；不能直接上传现有开发包作为公开 DMG。
-- 已创建 `v1.0.0-beta.1` Release 草稿，写明功能和已知限制；签名、公证未完成，暂未
-  上传或公开 DMG 附件。已请求用户解锁 Mac 并恢复 Xcode 的 Apple Developer 账户登录。
+- 2026-09-14 用户恢复 Xcode 账户登录后，复用原有归档导出成功。主应用和小组件均使用
+  Cloud Managed Developer ID Application 签名，具备 hardened runtime、可信时间戳、
+  Production CloudKit／推送权限，无 get-task-allow；分发描述文件允许所有设备，
+  不包含注册设备列表。本机没有 Developer ID 私钥不妨碍 Xcode 云签名。
+- Desktop 的 iCloud 文件提供程序给导出包附加 FinderInfo，导致严格签名检查失败。
+  发行产物移入本机 Library 构建目录，复制时排除资源分支和扩展属性，重新校验通过；
+  未删除或重置用户任务、系统账户或 CloudKit 数据。
+- 使用 Xcode 已登录账户提交 Apple 公证成功，导出的应用已装订公证票据；stapler validate
+  通过，Gatekeeper 返回 accepted / Notarized Developer ID。DMG 已生成（约 5.9 MB），
+  只读挂载验证了 Applications 链接、安装说明、内嵌应用签名、公证票据和二进制一致性，
+  本次挂载已卸载。应用公证不等于 DMG 文件本身已公证。
+- `v1.0.0-beta.1` Release 仍为草稿。当前等待用户在本机配置 notarytool 的 Keychain
+  profile，随后完成 DMG 单独公证、装订及 GitHub 下载校验；暂未公开 DMG 附件。
+  自动控制工具拒绝操作 Terminal，已给出用户手动配置命令，未通过其他工具绕过限制。
 - 可重复的构建、导出、公证和发布步骤见 [RELEASING.md](RELEASING.md)。
 
 ### 应用与设备验收

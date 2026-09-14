@@ -5,6 +5,8 @@
 ## 分发前提
 
 - 使用 Developer ID Application 签名，主应用与小组件都保留各自的 App Group、CloudKit 权限。
+  可使用本机证书，或由已登录 Xcode 的团队使用云管理证书；本机 `security find-identity`
+  没有列出 Developer ID 不代表云签名不可用，以导出结果和实际签名为准。
 - 使用 Developer ID 分发描述文件；包含 `ProvisionedDevices` 的开发描述文件不能用于公开下载。
 - Release 使用 CloudKit Production、生产推送权限，无 `get-task-allow`。
 - Apple 公证通过并装订票据；不以关闭 Gatekeeper 或去掉权限绕过分发条件。
@@ -14,19 +16,23 @@
 
 ## 构建与导出
 
-先运行 `swift test --jobs 4`。避免同时启动其他 Xcode 构建。
+先运行 `swift test --jobs 4`。避免同时启动其他 Xcode 构建。发行目录放在本机 Library 中，
+不要放入 iCloud 管理的 Desktop 或 Documents：文件提供程序附加的 FinderInfo 可能导致
+签名校验失败。以下步骤使用同一个终端，并为新版本选择尚未使用的发行目录。
 
 ```sh
+DAYDO_RELEASE_ROOT="$HOME/Library/Developer/Xcode/DaydoRelease/1.0.0-beta.1"
+mkdir -p "$DAYDO_RELEASE_ROOT"
 xcodegen generate
 xcodebuild -project Daydo.xcodeproj -scheme Daydo -configuration Release \
   -destination 'generic/platform=macOS' \
   -derivedDataPath "$HOME/Library/Developer/Xcode/DerivedData/Daydo-todo" \
-  -archivePath "$PWD/release/Daydo.xcarchive" \
+  -archivePath "$DAYDO_RELEASE_ROOT/Daydo.xcarchive" \
   -jobs 4 -skipPackageUpdates -allowProvisioningUpdates \
   'ARCHS=arm64 x86_64' ONLY_ACTIVE_ARCH=NO DAYDO_APS_ENVIRONMENT=development archive
 
-xcodebuild -exportArchive -archivePath "$PWD/release/Daydo.xcarchive" \
-  -exportPath "$PWD/release/export" \
+xcodebuild -exportArchive -archivePath "$DAYDO_RELEASE_ROOT/Daydo.xcarchive" \
+  -exportPath "$DAYDO_RELEASE_ROOT/export" \
   -exportOptionsPlist Configuration/ExportOptions.plist -allowProvisioningUpdates
 ```
 
@@ -39,22 +45,47 @@ CloudKit 为 Production，主应用推送为 production。`lipo -archs` 应包�
 
 ## 公证与 DMG
 
-先通过 Apple 官方流程在本机 Keychain 配置 notarytool 凭据，把对应 profile 名称放入
-`DAYDO_NOTARY_PROFILE` 环境变量。不要把密码、私钥或凭据写进命令记录和仓库。
+### 使用已登录的 Xcode 公证应用
+
+Developer ID 的 `destination=upload` 会把应用上传到 Apple 公证服务，不是发布到 Mac App Store。
+这条流程复用 Xcode 账户和云管理证书；它不要求把 Apple 密码交给脚本。
 
 ```sh
-ditto -c -k --keepParent release/export/Daydo.app release/Daydo-notarization.zip
-xcrun notarytool submit release/Daydo-notarization.zip \
-  --keychain-profile "$DAYDO_NOTARY_PROFILE" --wait
-xcrun stapler staple release/export/Daydo.app
-xcrun stapler validate release/export/Daydo.app
-spctl --assess --type execute --verbose=2 release/export/Daydo.app
+cp Configuration/ExportOptions.plist "$DAYDO_RELEASE_ROOT/NotarizationOptions.plist"
+/usr/libexec/PlistBuddy -c 'Set :destination upload' "$DAYDO_RELEASE_ROOT/NotarizationOptions.plist"
+xcodebuild -exportArchive -archivePath "$DAYDO_RELEASE_ROOT/Daydo.xcarchive" \
+  -exportOptionsPlist "$DAYDO_RELEASE_ROOT/NotarizationOptions.plist" -allowProvisioningUpdates
 
-./script/package_dmg.sh "$PWD/release/export/Daydo.app" "$PWD/release/Daydo-1.0.0-universal.dmg"
-xcrun notarytool submit release/Daydo-1.0.0-universal.dmg \
+# 上传完成后，等待 Apple 处理完成，再导出带公证票据的应用。
+xcodebuild -exportNotarizedApp -archivePath "$DAYDO_RELEASE_ROOT/Daydo.xcarchive" \
+  -exportPath "$DAYDO_RELEASE_ROOT/notarized"
+codesign --verify --deep --strict "$DAYDO_RELEASE_ROOT/notarized/Daydo.app"
+xcrun stapler validate "$DAYDO_RELEASE_ROOT/notarized/Daydo.app"
+spctl --assess --type execute --verbose=2 "$DAYDO_RELEASE_ROOT/notarized/Daydo.app"
+```
+
+上传成功不代表公证完成。若仍在处理，应等待同一次提交，不要重新上传相同版本。
+
+### 打包并公证 DMG
+
+先在本机 Keychain 配置 notarytool 凭据，设置 `DAYDO_NOTARY_PROFILE` 为对应 profile 名称。
+可手动运行下面的命令，按提示输入 Apple 账户、团队和应用专用密码：
+
+```sh
+xcrun notarytool store-credentials "daydo-notary"
+DAYDO_NOTARY_PROFILE="daydo-notary"
+```
+
+不要在聊天、命令参数或仓库中写密码、私钥和令牌。Xcode 账户登录与 notarytool 的 Keychain
+profile 是两套配置；前一项完成不会自动创建后一项。
+
+```sh
+DAYDO_RELEASE_DMG="$DAYDO_RELEASE_ROOT/Daydo-1.0.0-beta.1-universal.dmg"
+./script/package_dmg.sh "$DAYDO_RELEASE_ROOT/notarized/Daydo.app" "$DAYDO_RELEASE_DMG"
+xcrun notarytool submit "$DAYDO_RELEASE_DMG" \
   --keychain-profile "$DAYDO_NOTARY_PROFILE" --wait
-xcrun stapler staple release/Daydo-1.0.0-universal.dmg
-xcrun stapler validate release/Daydo-1.0.0-universal.dmg
+xcrun stapler staple "$DAYDO_RELEASE_DMG"
+xcrun stapler validate "$DAYDO_RELEASE_DMG"
 ```
 
 `package_dmg.sh` 会拒绝开发签名、未公证应用以及已存在的输出文件。票据装订完成后再计算 SHA-256。

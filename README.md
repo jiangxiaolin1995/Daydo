@@ -20,7 +20,7 @@ Daydo 是一个用 SwiftUI 构建的 Mac 待办应用。打开即可使用，无
 
 最低支持 **macOS 14 Sonoma**。安装包和校验文件通过 [GitHub Releases](https://github.com/jiangxiaolin1995/Daydo/releases) 提供，具体架构与签名状态以版本说明为准。
 
-**当前分发状态：公开安装包正在准备。现有开发签名仅适用于已注册设备，尚未提供通过 Developer ID 签名和 Apple 公证的通用 DMG。** 在此状态更新前，请使用下方的源码构建方式。
+**当前分发状态：公开安装包正在准备。应用已完成 Developer ID 签名和 Apple 公证，DMG 已打包，正在完成安装包本身的公证与下载验收。** 在此状态更新前，请使用下方的源码构建方式。
 
 正式 DMG 发布后：
 
