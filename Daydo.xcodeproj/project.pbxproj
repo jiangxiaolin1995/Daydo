@@ -25,10 +25,12 @@
 		88BCCAC4145B17AE49046B4B /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057ED70B491F04A219B52786 /* CalendarView.swift */; };
 		8E00264E6499322C3059AB0E /* TaskEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACAB54A4464BA78D883D72D /* TaskEditor.swift */; };
 		A73BAE92056D1CE1DCD798D8 /* DebugFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5111EBA058A5626FD148041C /* DebugFixtures.swift */; };
+		AC94A0EB85AF2854377D154B /* MenuBarDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6444A420BB48B709962C0FA /* MenuBarDiagnostics.swift */; };
 		B96DA97924AB4C6714D68591 /* TaskRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E239D130BB353D0D3FD73640 /* TaskRow.swift */; };
 		C277DE28104C2E561B0B99CD /* THIRD_PARTY_NOTICES.txt in Resources */ = {isa = PBXBuildFile; fileRef = BB7C47C5B4DEB3E9BD15A5F7 /* THIRD_PARTY_NOTICES.txt */; };
+		C758BC916944C89A6E2D6FE0 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = 17A82A8DC3C7B0AF3CE86977 /* MCP */; };
 		CF9AB5D31AAFCFAB71FD9956 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04918A05A04ABCBFA5F490B /* RootView.swift */; };
-		D5F1D4AD766141553932A825 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = 17A82A8DC3C7B0AF3CE86977 /* MCP */; };
+		D5F1D4AD766141553932A825 /* DaydoDesktop in Frameworks */ = {isa = PBXBuildFile; productRef = 227B038160DFB2DFF1F39F19 /* DaydoDesktop */; };
 		DAAF26ED48942BA43CF07E26 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2778EE3472A3C4EBA16F551A /* DesignTokens.swift */; };
 		E4DBF1D7D0E266AA2A300B0B /* DaydoCore in Frameworks */ = {isa = PBXBuildFile; productRef = FBC8BEE7A0B9689652FF4F32 /* DaydoCore */; };
 		EEAB825A8886CF6EEF231B8C /* CloudAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717F62C5D28A2C8AB7CBF4AF /* CloudAccountService.swift */; };
@@ -76,6 +78,7 @@
 		9D96F3A7B9BBAA31F1A083CF /* Daydo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Daydo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAE94E3327E1C9247F38346E /* CloudDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudDiagnostics.swift; sourceTree = "<group>"; };
 		BB7C47C5B4DEB3E9BD15A5F7 /* THIRD_PARTY_NOTICES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = THIRD_PARTY_NOTICES.txt; sourceTree = "<group>"; };
+		C6444A420BB48B709962C0FA /* MenuBarDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDiagnostics.swift; sourceTree = "<group>"; };
 		D381F912406CCEC978FC6E41 /* CompatibleStdioTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibleStdioTransport.swift; sourceTree = "<group>"; };
 		D46415891AAF6E31A77B45D6 /* DaydoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaydoApp.swift; sourceTree = "<group>"; };
 		E04918A05A04ABCBFA5F490B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -93,7 +96,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				55E728E6020107ABE6CD108A /* DaydoCore in Frameworks */,
-				D5F1D4AD766141553932A825 /* MCP in Frameworks */,
+				D5F1D4AD766141553932A825 /* DaydoDesktop in Frameworks */,
+				C758BC916944C89A6E2D6FE0 /* MCP in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,6 +151,7 @@
 				AAE94E3327E1C9247F38346E /* CloudDiagnostics.swift */,
 				D46415891AAF6E31A77B45D6 /* DaydoApp.swift */,
 				5111EBA058A5626FD148041C /* DebugFixtures.swift */,
+				C6444A420BB48B709962C0FA /* MenuBarDiagnostics.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -249,6 +254,7 @@
 			name = Daydo;
 			packageProductDependencies = (
 				161FF116C879715DDB701525 /* DaydoCore */,
+				227B038160DFB2DFF1F39F19 /* DaydoDesktop */,
 				17A82A8DC3C7B0AF3CE86977 /* MCP */,
 			);
 			productName = Daydo;
@@ -330,6 +336,7 @@
 				A73BAE92056D1CE1DCD798D8 /* DebugFixtures.swift in Sources */,
 				DAAF26ED48942BA43CF07E26 /* DesignTokens.swift in Sources */,
 				3AF7D7E8464458160735E270 /* MCPToolCatalog.swift in Sources */,
+				AC94A0EB85AF2854377D154B /* MenuBarDiagnostics.swift in Sources */,
 				729479F98E4CEC77656AAA3A /* NotificationService.swift in Sources */,
 				CF9AB5D31AAFCFAB71FD9956 /* RootView.swift in Sources */,
 				F0E1B1985553C0377D2140A5 /* SettingsView.swift in Sources */,
@@ -415,7 +422,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 2S5P3UNGAL;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -532,7 +539,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 2S5P3UNGAL;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -648,6 +655,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E3B6AFBD25F526AEF92416B8 /* XCRemoteSwiftPackageReference "swift-sdk" */;
 			productName = MCP;
+		};
+		227B038160DFB2DFF1F39F19 /* DaydoDesktop */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DaydoDesktop;
 		};
 		FBC8BEE7A0B9689652FF4F32 /* DaydoCore */ = {
 			isa = XCSwiftPackageProductDependency;

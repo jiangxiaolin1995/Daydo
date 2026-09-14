@@ -12,6 +12,8 @@ import uuid
 parser = argparse.ArgumentParser()
 parser.add_argument("binary")
 parser.add_argument("--exercise", action="store_true")
+parser.add_argument("--background-pid", type=int,
+                    help="Verify this already-windowless GUI process stays out of the Dock during MCP writes.")
 parser.add_argument("--report", default="artifacts/mcp-report.json")
 args = parser.parse_args()
 report_path = pathlib.Path(args.report)
@@ -41,10 +43,21 @@ with stderr_path.open("w") as stderr:
     def tool(name, arguments):
         result = request("tools/call", {"name": name, "arguments": arguments})
         content = json.loads(result["content"][0]["text"])
+        if args.background_pid and name in ["create_list", "update_list", "create_task", "update_task", "set_task_completion"]:
+            record_presentation(name)
         return content, bool(result.get("isError"))
+    def record_presentation(step):
+        output = subprocess.check_output(
+            ["lsappinfo", "info", "-only", "pid,ApplicationType", str(args.background_pid)], text=True)
+        background_checks.append({"step": step, "process": output.strip()})
+        return '"ApplicationType"="UIElement"' in output and f'"pid"={args.background_pid}' in output
     report = {}
+    background_checks = []
     test_list = None
     try:
+        if args.background_pid:
+            assert args.exercise, "--background-pid requires --exercise"
+            assert record_presentation("before"), "Close all Daydo windows before this check"
         init = request("initialize", {"protocolVersion": "2025-06-18", "capabilities": {"experimental": {"codex/auth-change": {}}, "elicitation": {"form": {}, "url": {}}}, "clientInfo": {"name": "DaydoAcceptance", "version": "1.0"}})
         report["protocolVersion"] = init["protocolVersion"]
         process.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
@@ -88,6 +101,9 @@ with stderr_path.open("w") as stderr:
             _, failed = tool("list_lists", {})
             assert not failed
             report["taskExercise"] = "not_requested"
+        if args.background_pid:
+            assert all('"ApplicationType"="UIElement"' in item["process"] for item in background_checks), \
+                "MCP brought the background coordinator back into the Dock"
         report["success"] = True
     except Exception as error:
         report["success"] = False
@@ -98,6 +114,10 @@ with stderr_path.open("w") as stderr:
                 _, failed = tool("update_list", {"listId": test_list["id"], "expectedRevision": test_list["revision"], "isArchived": True})
                 report["testListArchived"] = not failed
             except Exception as error: report["cleanupError"] = str(error)
+        if args.background_pid:
+            report["backgroundCoordinator"] = {"pid": args.background_pid, "checks": background_checks}
+            if not all('"ApplicationType"="UIElement"' in item["process"] for item in background_checks):
+                report["success"] = False
         process.stdin.close()
         try:
             process.wait(timeout=10)

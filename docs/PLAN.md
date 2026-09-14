@@ -9,10 +9,14 @@
 macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆角和层次。
 包含多清单、任务详情、重复实例、系统提醒、日周月日历、标准 stdio MCP、三种尺寸
 的交互小组件、版本化 JSON 备份及蓝色日历勾选图标。允许关窗后后台运行，可开机启动。
+菜单栏使用直径 16pt（2x Retina 为 32px）的原生单色实心圆对号模板图。
+关闭最后一个窗口后隐藏 Dock 图标，进程继续运行；
+重新打开主窗口或设置时恢复 Dock 入口，最小化保留 Dock 入口。
 
 ## 架构与接口
 
-- XcodeGen 管理应用和 Widget Extension；DaydoCore 为本地 Swift Package。
+- XcodeGen 管理应用和 Widget Extension；本地 Swift Package 包含共享业务 DaydoCore
+  和仅主应用使用的 AppKit 窗口桥接 DaydoDesktop。
 - Core Data SQLite 位于 App Group，主进程使用 NSPersistentCloudKitContainer。
 - 持久历史、跨进程通知、文件锁、稳定 ID、乐观版本检查与创建请求去重。
 - 重复任务按系列与原发生日期标识，完成和单次编辑独立记录。编辑以后分割系列，保留过去。
@@ -26,6 +30,29 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
 
 ## 当前证据
 
+- 2026-09-14 菜单栏图标先改为 `checkmark.circle.fill`，尝试将 SwiftUI frame 调为
+  18pt、22pt。用户连续截图确认两次圆形墨迹都只有 26px，右侧参考图标为 32px；
+  这些 frame 修改未改变实际菜单栏图标尺寸，不能用编译和安装成功代替尺寸验收。
+  现改用 `MenuBarIcon.image` 原生绘制 16pt 圆形与镂空对号，使用模板模式跟随菜单栏颜色。
+  安装版 `NSStatusBarButton` 日志确认实际 image 和绘制区域均为 16×16pt，backing=2，
+  即 32×32px。证据见 `artifacts/menu-bar-native-geometry.log`。Debug 启动仅记录一次
+  不含用户数据的图标尺寸日志，Release 不包含此诊断。
+  `WindowPresentationController` 监听原生窗口关闭及激活通知，排除菜单栏临时窗口和
+  已关闭但仍被 SwiftUI 保留的窗口；设置未关或主窗口最小化时保留 Dock 入口。
+  保持单实例主窗口及不退出进程的约定，菜单、外部链接和应用再次打开时恢复前台模式。
+- 本次新增 7 项窗口回归测试，先复现失败，再通过全部 45 项测试。真实安装版点击红色
+  关闭按钮后，Launch Services 的同一 GUI PID 从 `Foreground` 变为 `UIElement`；
+  重新打开恢复 `Foreground` 和同一个 `main` 窗口，最小化保留 `Foreground`。
+  实测独立设置窗口可打开，设置仍开着时关闭主窗口不会隐藏 Dock。
+- 同时修复 MCP 仅识别 `.regular` 协调进程的问题，`.accessory` 后台进程也视为已运行。
+  真实 stdio 写入回归先在旧逻辑复现 Dock 被重新唤起，修复后创建清单、任务、编辑、
+  完成、重试和归档全程保持同一后台 GUI PID；测试清单已归档，测试客户端均随 EOF 退出。
+  证据为 `artifacts/mcp-dock-red.json`、`artifacts/mcp-dock-green.json` 和
+  `artifacts/window-presentation-verification.json`；`script/check_mcp.py --exercise
+  --background-pid <GUI_PID>` 可在手动关闭所有窗口后重复执行。
+  小组件和应用的完成 Intent 元数据仍通过后台模式校验。本次未重复操作真实桌面任务。
+  已安装到 `~/Applications/Daydo.app`，已有 MCP 连接需要重连才能加载新版服务端。
+  此变更纳入 1.0.0 Beta 2（build 2）发布；保留已发布的 Beta 1 安装包。
 - 本机 macOS 26.6.2、Xcode 26.6、Swift 6.3.3；完整应用与小组件已构建和签名。
 - 开发团队 2S5P3UNGAL；App ID com.xiaolin.daydo，Widget com.xiaolin.daydo.widget。
 - App Group 2S5P3UNGAL.com.xiaolin.daydo；CloudKit iCloud.com.xiaolin.daydo。
@@ -89,6 +116,10 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
 
 ### GitHub 公开发布（2026-09-14）
 
+- 用户已授权将菜单栏、关窗和 MCP 后台修复提交到 main、推送 GitHub 并发布新包。
+  当前本地与 origin/main 基线一致；Beta 2 使用新 tag `v1.0.0-beta.2`，不覆盖 Beta 1。
+  发布前重新测试，重新构建双架构 Release，验证分发签名并分别公证应用与 DMG。
+  完成后更新 README 下载链接并验证公开下载的实际附件。
 - 用户授权公开源码、编写面向用户的 README，并在 GitHub Releases 提供 DMG。
 - 公开仓库已创建：[jiangxiaolin1995/Daydo](https://github.com/jiangxiaolin1995/Daydo)，
   首次源码提交 `f12278d` 已推送到 main，并核对本地、远程提交及 README 内容一致。

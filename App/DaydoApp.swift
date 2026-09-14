@@ -1,5 +1,6 @@
 import SwiftUI
 import DaydoCore
+import DaydoDesktop
 import UserNotifications
 
 @main
@@ -26,7 +27,9 @@ struct DaydoApp: App {
             AppContent().environment(model).tint(.blue)
                 .frame(minWidth: 900, minHeight: 610)
                 .task { if !model.hasStarted { model.hasStarted = true; await model.start() } }
-                .onOpenURL { model.openURL($0) }
+                .onOpenURL { url in
+                    presentDaydoWindow { model.openURL(url) }
+                }
                 .handlesExternalEvents(preferring: ["daydo://"], allowing: ["daydo://"])
         }
         .handlesExternalEvents(matching: ["daydo://"])
@@ -78,13 +81,20 @@ private struct DaydoMenuLabel: View {
     @State private var handledLaunch = false
 
     var body: some View {
-        Image(systemName: "checkmark.square").accessibilityLabel("Daydo")
+        Image(nsImage: MenuBarIcon.image)
+            .renderingMode(.template)
+            .accessibilityLabel("Daydo")
             .task {
                 guard !handledLaunch else { return }
                 handledLaunch = true
-                if !CommandLine.arguments.contains("--background") { openWindow(id: "main") }
+                if !CommandLine.arguments.contains("--background") {
+                    presentDaydoWindow { openWindow(id: "main") }
+                }
                 // A windowless coordinator must still load data, sync, and maintain reminders.
                 if !model.hasStarted { model.hasStarted = true; await model.start() }
+                #if DEBUG
+                DispatchQueue.main.async { MenuBarDiagnostics.recordImageGeometry() }
+                #endif
             }
     }
 }
@@ -92,23 +102,38 @@ private struct DaydoMenuLabel: View {
 private struct DaydoMenu: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
     var body: some View {
-        Button("打开 Daydo") { openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true) }
+        Button("打开 Daydo") { presentDaydoWindow { openWindow(id: "main") } }
         if model.isReady {
             Button("新建任务") {
-                openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true)
+                presentDaydoWindow { openWindow(id: "main") }
                 model.requestNewTask = true
             }
             let today = OccurrenceEngine.expand(model.snapshot, from: .today(), through: .today())
             Text("今天还有 \(today.filter { !$0.isCompleted }.count) 项")
         }
         Divider()
-        SettingsLink { Text("设置…") }
+        Button("设置…") { presentDaydoWindow { openSettings() } }
         Button("退出 Daydo") { NSApp.terminate(nil) }.keyboardShortcut("q")
     }
 }
 
+@MainActor
+private func presentDaydoWindow(_ open: () -> Void) {
+    NSApp.setActivationPolicy(.regular)
+    open()
+    NSApp.activate(ignoringOtherApps: true)
+}
+
+@MainActor
 final class DaydoDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+    private let windowPresentation = WindowPresentationController()
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        windowPresentation.start(background: CommandLine.arguments.contains("--background"))
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
         if CommandLine.arguments.contains("--background") {
@@ -117,10 +142,13 @@ final class DaydoDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCe
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        sender.setActivationPolicy(.regular)
         if let window = sender.windows.first(where: {
             $0.identifier?.rawValue == "main" || $0.identifier?.rawValue.hasPrefix("main-") == true
         }) {
-            if !flag { window.makeKeyAndOrderFront(nil) }
+            if window.isMiniaturized { window.deminiaturize(nil) }
+            window.makeKeyAndOrderFront(nil)
+            sender.activate(ignoringOtherApps: true)
             // We handled the reopen; do not also request a new untitled SwiftUI scene.
             return false
         }

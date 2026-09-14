@@ -86,7 +86,10 @@ enum DaydoMCP {
     }
     @MainActor static func wakeCoordinator() async {
         let running = NSRunningApplication.runningApplications(withBundleIdentifier: DaydoConstants.bundleID)
-            .contains { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier && $0.activationPolicy == .regular }
+            .contains {
+                $0.processIdentifier != ProcessInfo.processInfo.processIdentifier &&
+                    ($0.activationPolicy == .regular || $0.activationPolicy == .accessory)
+            }
         guard !running else { return }
         let url = Bundle.main.bundleURL
         guard url.pathExtension == "app" else { return }
