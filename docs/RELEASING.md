@@ -78,6 +78,8 @@ DAYDO_NOTARY_PROFILE="daydo-notary"
 
 不要在聊天、命令参数或仓库中写密码、私钥和令牌。Xcode 账户登录与 notarytool 的 Keychain
 profile 是两套配置；前一项完成不会自动创建后一项。
+应用专用密码应在 account.apple.com 使用同一个开发者 Apple 账户生成；终端需要输入网页
+生成的应用专用密码。`store-credentials` 验证和保存成功后，才继续提交公证。
 
 ```sh
 DAYDO_RELEASE_DMG="$DAYDO_RELEASE_ROOT/Daydo-1.0.0-beta.1-universal.dmg"

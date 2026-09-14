@@ -109,7 +109,14 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
   本次挂载已卸载。应用公证不等于 DMG 文件本身已公证。
 - 用户完成 notarytool 的本机 Keychain 配置后，DMG 单独公证返回 Accepted，statusCode=0、
   issues=null；公证票据已装订，stapler validate 通过。已生成最终 SHA-256 校验文件。
-  `v1.0.0-beta.1` 草稿已上传 DMG 和校验文件，正在进行公开发布与下载验收。
+- [v1.0.0-beta.1](https://github.com/jiangxiaolin1995/Daydo/releases/tag/v1.0.0-beta.1)
+  已于 2026-09-14 公开发布为预览版，包含 `Daydo-1.0.0-beta.1-universal.dmg` 和
+  `SHA256SUMS.txt`。tag 指向 `4b05d72`，应用源文件与已验证归档一致，后续变更仅为文档。
+- 已使用无 GitHub 登录凭据的请求下载两个公开附件；DMG 为 5,888,219 字节，SHA-256
+  与本地最终产物、GitHub 附件 digest 及校验文件一致。下载后的磁盘镜像校验、公证票据、
+  只读挂载、内嵌应用签名、公证票据、Gatekeeper、Applications 链接和两种架构均验证通过。
+  本次挂载已卸载，发布相关子进程均已结束；README 的直接下载链接与远程内容已核对。
+  此验证不替代另一台 Mac、Intel 或 macOS 14 实机验收，也不代表 iCloud 同步已成功。
 - 可重复的构建、导出、公证和发布步骤见 [RELEASING.md](RELEASING.md)。
 
 ### 应用与设备验收
