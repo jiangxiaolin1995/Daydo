@@ -18,14 +18,14 @@ Daydo 是一个用 SwiftUI 构建的 Mac 待办应用。打开即可使用，无
 
 ## 下载与安装
 
-最低支持 **macOS 14 Sonoma**。当前版本为 **1.0.0 Beta 1**，安装包同时包含 Apple Silicon 和 Intel 架构。
+最低支持 **macOS 14 Sonoma**。当前版本为 **1.0.0 Beta 2**（构建号 2），安装包同时包含 Apple Silicon 和 Intel 架构。
 
-[**下载 DMG 安装包**](https://github.com/jiangxiaolin1995/Daydo/releases/download/v1.0.0-beta.1/Daydo-1.0.0-beta.1-universal.dmg) · [SHA-256 校验文件](https://github.com/jiangxiaolin1995/Daydo/releases/download/v1.0.0-beta.1/SHA256SUMS.txt) · [版本说明](https://github.com/jiangxiaolin1995/Daydo/releases/tag/v1.0.0-beta.1)
+[**下载 DMG 安装包**](https://github.com/jiangxiaolin1995/Daydo/releases/download/v1.0.0-beta.2/Daydo-1.0.0-beta.2-universal.dmg) · [SHA-256 校验文件](https://github.com/jiangxiaolin1995/Daydo/releases/download/v1.0.0-beta.2/SHA256SUMS.txt) · [版本说明](https://github.com/jiangxiaolin1995/Daydo/releases/tag/v1.0.0-beta.2)
 
 应用与小组件使用 Developer ID Application 签名；应用和 DMG 均已通过 Apple 公证并装订票据。
 **当前为预览版，iCloud 跨设备同步等场景仍在验证中**，具体限制见下文和版本说明。
 
-1. 下载 `Daydo-1.0.0-beta.1-universal.dmg`。
+1. 下载 `Daydo-1.0.0-beta.2-universal.dmg`。
 2. 打开 DMG，把 `Daydo.app` 拖到 `Applications`。
 3. 从「应用程序」打开 Daydo，开始记录任务。
 4. 需要提醒时，在「设置 → 通用」允许通知；需要小组件时，按下方说明添加。
@@ -48,7 +48,7 @@ Daydo 是一个用 SwiftUI 构建的 Mac 待办应用。打开即可使用，无
 
 没有日期的任务进入收集箱；只有日期的任务显示在全天区域；过期未完成的任务在「今天」中单独展示，原计划日期保持不变。时间以 15 分钟为单位，默认时长 30 分钟，日历默认周一开始。
 
-关闭窗口后 Daydo 会留在菜单栏，继续处理同步和提醒；可在设置中开启开机启动。界面跟随系统浅色／深色外观。
+关闭最后一个窗口后，Daydo 会隐藏 Dock 图标并留在菜单栏，继续处理同步和提醒。点击菜单栏的圆形对号可重新打开应用；最小化保留 Dock 入口。Agent 在后台新增、编辑或完成任务不会再次弹出窗口。可在设置中开启开机启动，界面跟随系统浅色／深色外观。
 
 ## iCloud 与数据
 
@@ -159,7 +159,7 @@ swift test --jobs 4
 python3 script/check_widget_intent.py "$HOME/Applications/Daydo.app"
 ```
 
-核心测试使用临时数据，覆盖日期、重复实例、提醒、删除恢复、请求去重、并发版本检查、备份与跨进程历史等。真实界面、小组件和 iCloud 的验证状态见 [项目方案](docs/PLAN.md)。
+45 项测试覆盖日期、重复实例、提醒、删除恢复、请求去重、并发版本检查、备份、跨进程历史及窗口与 Dock 状态。核心测试使用临时数据。真实界面、小组件和 iCloud 的验证状态见 [项目方案](docs/PLAN.md)。
 
 ### 项目结构
 
@@ -167,10 +167,11 @@ python3 script/check_widget_intent.py "$HOME/Applications/Daydo.app"
 App/                 应用入口、窗口与菜单栏
 Views/               SwiftUI 主界面、日历与设置
 Sources/DaydoCore/    模型、重复规则、存储与共享任务操作
+Sources/DaydoDesktop/ 菜单栏图标与窗口、Dock 行为
 Services/            同步、提醒与应用状态
 MCP/                 官方 Swift MCP SDK 的 stdio 服务
 Widget/、Shared/     WidgetKit 与完成任务 App Intent
-Tests/               核心回归测试
+Tests/               业务与窗口回归测试
 Configuration/       权限、Info.plist、MCP 与分发配置
 script/              构建、验证与打包入口
 Assets/              应用图标与资源

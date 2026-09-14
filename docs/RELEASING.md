@@ -21,7 +21,7 @@
 签名校验失败。以下步骤使用同一个终端，并为新版本选择尚未使用的发行目录。
 
 ```sh
-DAYDO_RELEASE_ROOT="$HOME/Library/Developer/Xcode/DaydoRelease/1.0.0-beta.1"
+DAYDO_RELEASE_ROOT="$HOME/Library/Developer/Xcode/DaydoRelease/1.0.0-beta.2"
 mkdir -p "$DAYDO_RELEASE_ROOT"
 xcodegen generate
 xcodebuild -project Daydo.xcodeproj -scheme Daydo -configuration Release \
@@ -82,7 +82,7 @@ profile 是两套配置；前一项完成不会自动创建后一项。
 生成的应用专用密码。`store-credentials` 验证和保存成功后，才继续提交公证。
 
 ```sh
-DAYDO_RELEASE_DMG="$DAYDO_RELEASE_ROOT/Daydo-1.0.0-beta.1-universal.dmg"
+DAYDO_RELEASE_DMG="$DAYDO_RELEASE_ROOT/Daydo-1.0.0-beta.2-universal.dmg"
 ./script/package_dmg.sh "$DAYDO_RELEASE_ROOT/notarized/Daydo.app" "$DAYDO_RELEASE_DMG"
 xcrun notarytool submit "$DAYDO_RELEASE_DMG" \
   --keychain-profile "$DAYDO_NOTARY_PROFILE" --wait
@@ -91,6 +91,12 @@ xcrun stapler validate "$DAYDO_RELEASE_DMG"
 ```
 
 `package_dmg.sh` 会拒绝开发签名、未公证应用以及已存在的输出文件。票据装订完成后再计算 SHA-256。
+
+若 Keychain profile 已可用，也可以省去 Xcode 的公证上传步骤：将正常 Developer ID 导出的
+`export/Daydo.app` 用 `ditto -c -k --keepParent --noextattr --norsrc` 封装为 ZIP，使用
+`notarytool submit --keychain-profile daydo-notary --wait` 提交，确认 Accepted 后给原应用
+执行 `stapler staple`。再将此已公证应用传给 `package_dmg.sh`，继续单独公证 DMG。
+Beta 2 已验证这条流程，云管理 Developer ID 签名仍由 Xcode 正常导出完成。
 
 ## GitHub Release
 
