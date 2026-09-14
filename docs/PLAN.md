@@ -107,9 +107,9 @@ macOS 14+，SwiftUI 原生侧栏与系统字体，参考 HeroUI 的蓝色、圆�
   通过，Gatekeeper 返回 accepted / Notarized Developer ID。DMG 已生成（约 5.9 MB），
   只读挂载验证了 Applications 链接、安装说明、内嵌应用签名、公证票据和二进制一致性，
   本次挂载已卸载。应用公证不等于 DMG 文件本身已公证。
-- `v1.0.0-beta.1` Release 仍为草稿。当前等待用户在本机配置 notarytool 的 Keychain
-  profile，随后完成 DMG 单独公证、装订及 GitHub 下载校验；暂未公开 DMG 附件。
-  自动控制工具拒绝操作 Terminal，已给出用户手动配置命令，未通过其他工具绕过限制。
+- 用户完成 notarytool 的本机 Keychain 配置后，DMG 单独公证返回 Accepted，statusCode=0、
+  issues=null；公证票据已装订，stapler validate 通过。已生成最终 SHA-256 校验文件。
+  `v1.0.0-beta.1` 草稿已上传 DMG 和校验文件，正在进行公开发布与下载验收。
 - 可重复的构建、导出、公证和发布步骤见 [RELEASING.md](RELEASING.md)。
 
 ### 应用与设备验收

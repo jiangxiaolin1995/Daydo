@@ -18,13 +18,14 @@ Daydo 是一个用 SwiftUI 构建的 Mac 待办应用。打开即可使用，无
 
 ## 下载与安装
 
-最低支持 **macOS 14 Sonoma**。安装包和校验文件通过 [GitHub Releases](https://github.com/jiangxiaolin1995/Daydo/releases) 提供，具体架构与签名状态以版本说明为准。
+最低支持 **macOS 14 Sonoma**。当前版本为 **1.0.0 Beta 1**，安装包同时包含 Apple Silicon 和 Intel 架构。
 
-**当前分发状态：公开安装包正在准备。应用已完成 Developer ID 签名和 Apple 公证，DMG 已打包，正在完成安装包本身的公证与下载验收。** 在此状态更新前，请使用下方的源码构建方式。
+[**下载 DMG 安装包**](https://github.com/jiangxiaolin1995/Daydo/releases/download/v1.0.0-beta.1/Daydo-1.0.0-beta.1-universal.dmg) · [SHA-256 校验文件](https://github.com/jiangxiaolin1995/Daydo/releases/download/v1.0.0-beta.1/SHA256SUMS.txt) · [版本说明](https://github.com/jiangxiaolin1995/Daydo/releases/tag/v1.0.0-beta.1)
 
-正式 DMG 发布后：
+应用与小组件使用 Developer ID Application 签名；应用和 DMG 均已通过 Apple 公证并装订票据。
+**当前为预览版，iCloud 跨设备同步等场景仍在验证中**，具体限制见下文和版本说明。
 
-1. 在 Releases 下载 `Daydo-版本号-universal.dmg`。
+1. 下载 `Daydo-1.0.0-beta.1-universal.dmg`。
 2. 打开 DMG，把 `Daydo.app` 拖到 `Applications`。
 3. 从「应用程序」打开 Daydo，开始记录任务。
 4. 需要提醒时，在「设置 → 通用」允许通知；需要小组件时，按下方说明添加。
